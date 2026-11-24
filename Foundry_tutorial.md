@@ -28,7 +28,7 @@ Set these values in `.env`:
 | Command | Capability |
 |---|---|
 | `python python_examples/01_basic_chat.py` | Multi-turn Responses API chat |
-| `python python_examples/02_ocr_invoice.py` | Document Intelligence invoice OCR |
+| `python python_examples/02_ocr_invoice.py` | Document Intelligence Layout OCR + chat mapping to invoice JSON |
 | `python python_examples/02_ocr_invoice.py --vision` | Vision model OCR on the noisy sample |
 | `python python_examples/03_vector_search.py` | Vector Search / File Search over the policy PDF |
 | `python python_examples/04_text2sql.py` | Text2SQL with a read-only SQL guardrail |

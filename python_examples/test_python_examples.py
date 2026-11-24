@@ -94,6 +94,93 @@ class PythonWorkshopTests(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertEqual(ocr._extract_bank_details(text), expected)
 
+    def test_layout_ocr_maps_markdown_to_existing_invoice_schema(self):
+        ocr = workshop_api._load("02_ocr_invoice.py", "ap_ocr_layout_test")
+        invoice = {
+            key: value for key, value in self.invoices["INV-TTS-2026-118.pdf"].items()
+            if key != "_scenario"
+        }
+        invoice["vendor_tax_id"] = "0-1234-56789-01-2"
+        content = (
+            "# Invoice INV-TTS-2026-118\n\n"
+            "| Item | Quantity | Unit price | Amount |\n"
+            "| --- | --- | --- | --- |\n"
+            "| SVC-LAPTOP-IMG | 40 | 1250 | 50000 |\n"
+        )
+        create = unittest.mock.Mock(return_value=SimpleNamespace(output_text=json.dumps(invoice)))
+        client = SimpleNamespace(responses=SimpleNamespace(create=create))
+        cfg = {
+            "docintel_endpoint": "https://example.cognitiveservices.azure.com/",
+            "api_key": "test-key",
+            "chat_deployment": "test-chat",
+        }
+        replies = [
+            (202, {"operation-location": "https://example.test/operation"}, b""),
+            (200, {}, b'{"status": "running"}'),
+            (200, {}, json.dumps({
+                "status": "succeeded", "analyzeResult": {"content": content},
+            }).encode()),
+        ]
+        with patch.object(ocr, "_request", side_effect=replies) as request, \
+                patch.object(ocr.time, "sleep"), \
+                patch.object(ocr, "client_for", return_value=client):
+            result = ocr.extract_with_document_intelligence(
+                DATA / "invoices" / "INV-TTS-2026-118.pdf", cfg,
+            )
+        analyze = request.call_args_list[0]
+        self.assertIn("/prebuilt-layout:analyze?", analyze.args[0])
+        self.assertIn("outputContentFormat=markdown", analyze.args[0])
+        self.assertEqual(analyze.kwargs["method"], "POST")
+        self.assertIn("base64Source", json.loads(analyze.kwargs["data"]))
+        self.assertEqual(request.call_args_list[1].args[0], "https://example.test/operation")
+        payload = create.call_args.kwargs
+        self.assertEqual(payload["model"], "test-chat")
+        self.assertIn(content, payload["input"][0]["content"])
+        self.assertEqual(payload["text"]["format"]["schema"], ocr.INVOICE_SCHEMA)
+        self.assertTrue(payload["text"]["format"]["strict"])
+        self.assertEqual(result["vendor_tax_id"], "0123456789012")
+        self.assertEqual(result["lines"], invoice["lines"])
+        self.assertEqual(set(result), set(ocr.INVOICE_SCHEMA["required"]))
+
+    def test_layout_ocr_surfaces_failed_and_empty_analysis(self):
+        ocr = workshop_api._load("02_ocr_invoice.py", "ap_ocr_layout_errors_test")
+        cfg = {"docintel_endpoint": "https://example.test/", "api_key": "test-key"}
+        for response, error, message in (
+            ({"status": "failed", "error": {"message": "Unreadable file"}},
+             RuntimeError, "Unreadable file"),
+            ({"status": "succeeded", "analyzeResult": {"content": " \n"}},
+             ValueError, "no invoice text"),
+        ):
+            with self.subTest(response=response), \
+                    patch.object(ocr, "_request", side_effect=[
+                        (202, {"operation-location": "https://example.test/operation"}, b""),
+                        (200, {}, json.dumps(response).encode()),
+                    ]), patch.object(ocr.time, "sleep"), \
+                    patch.object(ocr, "client_for") as client, \
+                    self.assertRaisesRegex(error, message):
+                ocr.extract_with_document_intelligence(
+                    DATA / "invoices" / "INV-TTS-2026-118.pdf", cfg,
+                )
+            client.assert_not_called()
+
+    def test_vision_ocr_still_uses_image_and_vision_deployment(self):
+        ocr = workshop_api._load("02_ocr_invoice.py", "ap_ocr_vision_test")
+        invoice = self.invoices["INV-TTS-2026-118.pdf"]
+        create = unittest.mock.Mock(return_value=SimpleNamespace(output_text=json.dumps(invoice)))
+        client = SimpleNamespace(responses=SimpleNamespace(create=create))
+        with patch.object(ocr, "client_for", return_value=client), \
+                patch.object(ocr, "_request") as request:
+            result = ocr.extract_with_vision(
+                DATA / "invoices" / "INV-BEL-7781_scan.png", {"vision_deployment": "test-vision"},
+            )
+        request.assert_not_called()
+        payload = create.call_args.kwargs
+        self.assertEqual(payload["model"], "test-vision")
+        image = payload["input"][0]["content"][1]
+        self.assertEqual(image["type"], "input_image")
+        self.assertTrue(image["image_url"].startswith("data:image/png;base64,"))
+        self.assertEqual(result, invoice)
+
     def test_chat_router_serializes_thai_context_for_responses_api(self):
         create = unittest.mock.Mock(return_value=SimpleNamespace(output_text="data"))
         client = SimpleNamespace(responses=SimpleNamespace(create=create))

@@ -46,7 +46,9 @@ python python_examples/01_basic_chat.py
 
 ## Lab 2.2: OCR (read an invoice)
 
-### A. Document Intelligence prebuilt-invoice (recommended for production)
+### A. Document Intelligence prebuilt-layout + chat model
+
+Layout extracts text and tables as Markdown. The configured chat model then maps that content into the strict invoice JSON schema used by verification. This path requires both Document Intelligence and the chat deployment.
 
 ```bash
 python python_examples/02_ocr_invoice.py
@@ -84,11 +86,11 @@ python python_examples/02_ocr_invoice.py --vision
 
 | | Document Intelligence | Vision LLM |
 |---|---|---|
-| Strength | Field confidence, bounding boxes, stable output | Flexible, any layout or language, custom fields |
-| Watch out | Local fields (Thai bank account) need extra parsing | Can misread digits; always validate totals |
+| Strength | Layout OCR preserves document text and table structure | Flexible, any layout or language, custom fields |
+| Watch out | Chat maps OCR to fields; mapping can misread values | Can misread digits; always validate totals |
 | In this repo | `extract_with_document_intelligence` | `extract_with_vision` (strict JSON schema) |
 
-Document Intelligence v4 lists [Thai invoice support](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/language-support/prebuilt?view=doc-intel-4.0.0#invoice). The sample's Thai payment text is parsed for bank details; review fields and digits before running rules.
+This uses `prebuilt-layout`, not `prebuilt-invoice`. Layout does not return named invoice fields or invoice-field confidence scores; the chat model supplies the field mapping. The sample's Thai payment text is also parsed for bank details. Review fields, digits and totals before running rules.
 
 **Checkpoint 2.2:** you have JSON for one PDF and one PNG.
 
@@ -199,7 +201,7 @@ python python_examples/06_ap_verification_pipeline.py
 For each invoice in `data/invoices/`:
 
 ```
-[1 OCR]      Document Intelligence reads the invoice
+[1 OCR]      Document Intelligence Layout reads the invoice; chat maps it to JSON
 [2 RULES]    Deterministic 3-way match (python_examples/verify.py) decides APPROVED / ON HOLD / REJECTED
 [3 POLICY]   File Search finds the policy text that explains each exception
 [4 WEB IQ]   Checks the WHT rate for this vendor type is still current (if key set)

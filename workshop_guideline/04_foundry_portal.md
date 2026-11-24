@@ -126,8 +126,8 @@ A5) "ไม่พบข้อมูลนี้ในนโยบายบัญ
 
 ## Optional Lab 4.6: Document Intelligence Studio
 
-1. Open [Document Intelligence Studio](https://documentintelligence.ai.azure.com/studio) and select **Invoices**.
+1. Open [Document Intelligence Studio](https://documentintelligence.ai.azure.com/studio) and select **Layout**.
 2. Analyze `data/invoices/INV-BEL-7781_scan.png`.
-3. Compare the confidence scores for `Quantity` with the clean PDF `INV-BEL-7781.pdf`. Why does this matter for automatic approval?
+3. Compare the recognized quantity text and word confidence scores with the clean PDF `INV-BEL-7781.pdf`. Layout does not provide invoice-field confidence scores. Why must extracted quantities be validated before approval?
 
 Continue to [Lab 5: Multi-agent with Microsoft Agent Framework](05_agent_framework.md).

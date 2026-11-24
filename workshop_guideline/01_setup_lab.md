@@ -153,10 +153,10 @@ The code derives it from `FOUNDRY_ENDPOINT` automatically. Only set `FOUNDRY_DOC
 
 **Optional: try it with no code**
 
-1. Open [Document Intelligence Studio](https://documentintelligence.ai.azure.com/studio) and select **Invoices**.
+1. Open [Document Intelligence Studio](https://documentintelligence.ai.azure.com/studio) and select **Layout**.
 2. Choose your subscription and Foundry resource.
 3. Upload `data/invoices/INV-TTS-2026-118.pdf` and select **Run analysis**.
-4. Check that **InvoiceId**, **VendorName**, **PurchaseOrder** and the line **Items** are found.
+4. Check that invoice text and line-item tables are found. Layout does not return named invoice fields; Lab 2.2 uses the chat model to map the Layout output into invoice JSON.
 
 **Checkpoint 1.4:** you know your `cognitiveservices` endpoint (or you will let the code derive it).
 

@@ -34,7 +34,7 @@ def main() -> None:
             results.append((f"{label} ({deployment})", "FAIL", str(exc).splitlines()[0]))
 
     try:
-        url = f"{cfg['docintel_endpoint']}documentintelligence/documentModels/prebuilt-invoice?api-version=2024-11-30"
+        url = f"{cfg['docintel_endpoint']}documentintelligence/documentModels/prebuilt-layout?api-version=2024-11-30"
         request = urllib.request.Request(url, headers={"Ocp-Apim-Subscription-Key": cfg["api_key"]})
         with urllib.request.urlopen(request, timeout=30):
             results.append(("Document Intelligence (OCR)", "PASS", cfg["docintel_endpoint"]))
