@@ -4,10 +4,10 @@
     "invoice_date": "2026-10-28",
     "due_date": "2026-11-27",
     "po_number": "PO-2026-0101",
-    "vendor_name": "Siam Office Supplies Co., Ltd.",
+    "vendor_name": "บริษัท สยามเครื่องใช้สำนักงาน จำกัด",
     "vendor_tax_id": "0105551234567",
     "buyer_tax_id": "0105560000001",
-    "bank_name": "Kasikornbank",
+    "bank_name": "ธนาคารกสิกรไทย",
     "bank_account": "123-4-56789-0",
     "currency": "THB",
     "subtotal": 64100.0,
@@ -17,7 +17,7 @@
       {
         "line_no": 1,
         "item_code": "PAP-A4-80",
-        "description": "A4 copy paper 80gsm (box of 5 reams)",
+        "description": "กระดาษถ่ายเอกสาร A4 80 แกรม (กล่องละ 5 รีม)",
         "quantity": 50,
         "unit_price": 650.0,
         "amount": 32500.0
@@ -25,7 +25,7 @@
       {
         "line_no": 2,
         "item_code": "TON-HP26A",
-        "description": "Toner cartridge HP 26A",
+        "description": "ตลับหมึกเครื่องพิมพ์ HP 26A",
         "quantity": 10,
         "unit_price": 2800.0,
         "amount": 28000.0
@@ -33,23 +33,23 @@
       {
         "line_no": 3,
         "item_code": "MRK-WB-12",
-        "description": "Whiteboard markers (box of 12)",
+        "description": "ปากกาไวท์บอร์ด (กล่องละ 12 ด้าม)",
         "quantity": 20,
         "unit_price": 180.0,
         "amount": 3600.0
       }
     ],
-    "_scenario": "Clean 3-way match -> APPROVE (route to AP Manager, > THB 50,000)"
+    "_scenario": "เอกสารทั้งสามตรงกัน -> APPROVED (ส่งผู้จัดการบัญชีเจ้าหนี้ ยอดเกิน 50,000 บาท)"
   },
   "INV-TTS-2026-118.pdf": {
     "invoice_number": "INV-TTS-2026-118",
     "invoice_date": "2026-11-02",
     "due_date": "2026-12-17",
     "po_number": "PO-2026-0102",
-    "vendor_name": "Thai Tech Solutions Co., Ltd.",
+    "vendor_name": "บริษัท ไทยเทคโซลูชันส์ จำกัด",
     "vendor_tax_id": "0105562223334",
     "buyer_tax_id": "0105560000001",
-    "bank_name": "Siam Commercial Bank",
+    "bank_name": "ธนาคารไทยพาณิชย์",
     "bank_account": "345-6-78901-2",
     "currency": "THB",
     "subtotal": 86000.0,
@@ -59,7 +59,7 @@
       {
         "line_no": 1,
         "item_code": "SVC-LAPTOP-IMG",
-        "description": "Laptop setup and imaging service (per device)",
+        "description": "บริการติดตั้งระบบโน้ตบุ๊ก (ต่อเครื่อง)",
         "quantity": 40,
         "unit_price": 1250.0,
         "amount": 50000.0
@@ -67,23 +67,23 @@
       {
         "line_no": 2,
         "item_code": "SVC-M365-MIG",
-        "description": "Microsoft 365 mailbox migration (per mailbox)",
+        "description": "บริการย้ายกล่องจดหมาย Microsoft 365 (ต่อกล่อง)",
         "quantity": 40,
         "unit_price": 900.0,
         "amount": 36000.0
       }
     ],
-    "_scenario": "Unit price 1,250 vs PO 1,150 (+8.7%) -> HOLD (price variance > 2%)"
+    "_scenario": "ราคาต่อหน่วย 1,250 เทียบกับ PO 1,150 (+8.7%) -> ON HOLD (ต่างเกิน 2%)"
   },
   "INV-BEL-7781.pdf": {
     "invoice_number": "INV-BEL-7781",
     "invoice_date": "2026-11-05",
     "due_date": "2026-12-05",
     "po_number": "PO-2026-0103",
-    "vendor_name": "Bangkok Express Logistics Co., Ltd.",
+    "vendor_name": "บริษัท บางกอกเอ็กซ์เพรสโลจิสติกส์ จำกัด",
     "vendor_tax_id": "0105559876543",
     "buyer_tax_id": "0105560000001",
-    "bank_name": "Bangkok Bank",
+    "bank_name": "ธนาคารกรุงเทพ",
     "bank_account": "234-5-67890-1",
     "currency": "THB",
     "subtotal": 61200.0,
@@ -93,7 +93,7 @@
       {
         "line_no": 1,
         "item_code": "LOG-BKK-RYG",
-        "description": "Pallet delivery Bangkok - Rayong (per pallet)",
+        "description": "ค่าขนส่งพาเลต กรุงเทพฯ - ระยอง (ต่อพาเลต)",
         "quantity": 120,
         "unit_price": 450.0,
         "amount": 54000.0
@@ -101,23 +101,23 @@
       {
         "line_no": 2,
         "item_code": "LOG-FUEL",
-        "description": "Fuel surcharge (per trip)",
+        "description": "ค่าธรรมเนียมน้ำมัน (ต่อเที่ยว)",
         "quantity": 6,
         "unit_price": 1200.0,
         "amount": 7200.0
       }
     ],
-    "_scenario": "Billed 120 pallets / 6 trips but only 100 / 5 received -> HOLD (qty > GRN)"
+    "_scenario": "เรียกเก็บ 120 พาเลต / 6 เที่ยว แต่รับจริง 100 / 5 -> ON HOLD (จำนวนเกิน GRN)"
   },
   "INV-BEL-7781_scan.png": {
     "invoice_number": "INV-BEL-7781",
     "invoice_date": "2026-11-05",
     "due_date": "2026-12-05",
     "po_number": "PO-2026-0103",
-    "vendor_name": "Bangkok Express Logistics Co., Ltd.",
+    "vendor_name": "บริษัท บางกอกเอ็กซ์เพรสโลจิสติกส์ จำกัด",
     "vendor_tax_id": "0105559876543",
     "buyer_tax_id": "0105560000001",
-    "bank_name": "Bangkok Bank",
+    "bank_name": "ธนาคารกรุงเทพ",
     "bank_account": "234-5-67890-1",
     "currency": "THB",
     "subtotal": 61200.0,
@@ -127,7 +127,7 @@
       {
         "line_no": 1,
         "item_code": "LOG-BKK-RYG",
-        "description": "Pallet delivery Bangkok - Rayong (per pallet)",
+        "description": "ค่าขนส่งพาเลต กรุงเทพฯ - ระยอง (ต่อพาเลต)",
         "quantity": 120,
         "unit_price": 450.0,
         "amount": 54000.0
@@ -135,23 +135,23 @@
       {
         "line_no": 2,
         "item_code": "LOG-FUEL",
-        "description": "Fuel surcharge (per trip)",
+        "description": "ค่าธรรมเนียมน้ำมัน (ต่อเที่ยว)",
         "quantity": 6,
         "unit_price": 1200.0,
         "amount": 7200.0
       }
     ],
-    "_scenario": "Billed 120 pallets / 6 trips but only 100 / 5 received -> HOLD (qty > GRN)"
+    "_scenario": "เรียกเก็บ 120 พาเลต / 6 เที่ยว แต่รับจริง 100 / 5 -> ON HOLD (จำนวนเกิน GRN)"
   },
   "INV-CMP-2026-0057.pdf": {
     "invoice_number": "INV-CMP-2026-0057",
     "invoice_date": "2026-11-06",
     "due_date": "2026-12-06",
     "po_number": "PO-2026-0104",
-    "vendor_name": "Chiang Mai Paper Products Co., Ltd.",
+    "vendor_name": "บริษัท เชียงใหม่ผลิตภัณฑ์กระดาษ จำกัด",
     "vendor_tax_id": "0505553334445",
     "buyer_tax_id": "0105560000001",
-    "bank_name": "Siam Commercial Bank",
+    "bank_name": "ธนาคารไทยพาณิชย์",
     "bank_account": "999-1-23456-7",
     "currency": "THB",
     "subtotal": 26800.0,
@@ -161,7 +161,7 @@
       {
         "line_no": 1,
         "item_code": "PAP-RCY-A4",
-        "description": "Recycled A4 copy paper (per ream)",
+        "description": "กระดาษถ่ายเอกสาร A4 รีไซเคิล (ต่อรีม)",
         "quantity": 200,
         "unit_price": 115.0,
         "amount": 23000.0
@@ -169,12 +169,12 @@
       {
         "line_no": 2,
         "item_code": "CUP-8OZ-50",
-        "description": "Paper cups 8oz (pack of 50)",
+        "description": "แก้วกระดาษ 8 ออนซ์ (แพ็กละ 50 ใบ)",
         "quantity": 40,
         "unit_price": 95.0,
         "amount": 3800.0
       }
     ],
-    "_scenario": "Amounts match but bank account differs from vendor master -> HOLD (bank change verification)"
+    "_scenario": "ยอดเงินตรงกัน แต่บัญชีธนาคารต่างจากทะเบียนผู้ขาย -> ON HOLD (ต้องยืนยันการเปลี่ยนบัญชี)"
   }
 }

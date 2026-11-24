@@ -12,8 +12,8 @@ except ImportError:
     from common import client_for, config
 
 DEFAULT_QUESTIONS = [
-    "What is the current standard VAT rate in Thailand, and until when does the reduced rate apply?",
-    "What withholding tax rate does a Thai company deduct when paying a domestic company for transportation services?",
+    "อัตราภาษีมูลค่าเพิ่มของไทยในปัจจุบันเท่าไร และอัตราลดใช้ถึงเมื่อไร?",
+    "บริษัทไทยจ่ายค่าขนส่งให้บริษัทในประเทศต้องหักภาษี ณ ที่จ่ายอัตราเท่าไร?",
 ]
 
 
@@ -48,7 +48,7 @@ def ask_web(client, question: str, cfg: dict[str, str]) -> tuple[str, list[dict]
         instructions=(
             "You are an AP research assistant. Answer using ONLY the numbered web sources. Cite sources inline like [1]. "
             "Prefer official government sources (for example rd.go.th, bot.or.th). If sources disagree or are outdated, "
-            "say so. End with: 'Verify with the Tax team before changing any payment.'"
+            "say so. Answer in Thai. End with: 'ตรวจสอบกับทีมภาษีก่อนเปลี่ยนแปลงการจ่ายเงิน'"
         ),
         input=f"Question: {question}\n\nWeb sources:\n{context or '(no results)'}",
     )

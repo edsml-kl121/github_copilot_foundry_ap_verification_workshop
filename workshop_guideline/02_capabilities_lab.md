@@ -6,6 +6,8 @@
 
 **Before you start:** finish [Lab 1: Setup](01_setup_lab.md). The Python setup check must pass.
 
+The policy PDF, invoices and descriptive database values are Thai. Example questions and generated answers use Thai. JSON keys, SQL table/column names, status codes, amounts and ISO dates keep their original format.
+
 ## The business problem in 60 seconds
 
 Contoso's Accounts Payable (AP) team pays supplier invoices. Before paying, they do a **three-way match**:
@@ -58,8 +60,8 @@ Expected (shortened):
 {
   "invoice_number": "INV-TTS-2026-118",
   "po_number": "PO-2026-0102",
-  "vendor_name": "Thai Tech Solutions Co., Ltd.",
-  "bank_name": "Siam Commercial Bank",
+  "vendor_name": "บริษัท ไทยเทคโซลูชันส์ จำกัด",
+  "bank_name": "ธนาคารไทยพาณิชย์",
   "bank_account": "345-6-78901-2",
   "subtotal": 86000,
   "vat": 6020,
@@ -84,7 +86,9 @@ python python_examples/02_ocr_invoice.py --vision
 |---|---|---|
 | Strength | Field confidence, bounding boxes, stable output | Flexible, any layout or language, custom fields |
 | Watch out | Local fields (Thai bank account) need extra parsing | Can misread digits; always validate totals |
-| In this repo | `analyzeWithDocumentIntelligence` | `extractWithVision` (strict JSON schema) |
+| In this repo | `extract_with_document_intelligence` | `extract_with_vision` (strict JSON schema) |
+
+Document Intelligence v4 lists [Thai invoice support](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/language-support/prebuilt?view=doc-intel-4.0.0#invoice). The sample's Thai payment text is parsed for bank details; review fields and digits before running rules.
 
 **Checkpoint 2.2:** you have JSON for one PDF and one PNG.
 
@@ -106,12 +110,12 @@ Expected answers:
 | Bank account differs from vendor master? | Put ON HOLD. Call back on the phone number in the vendor master (not the invoice), get a signed letter, two-person approval, 5 business-day cooling-off (Section 6) |
 | Who approves THB 267,500? | Finance Controller (Section 7) |
 | WHT for IT services? | 3%, issue Form 50 Tawi (Section 8) |
-| Remote work policy? | "I cannot find that in the AP policy. Please contact ap-policy@contoso.example." |
+| Remote work policy? | "ไม่พบข้อมูลนี้ในนโยบายบัญชีเจ้าหนี้ กรุณาติดต่อ ap-policy@contoso.example" |
 
 Ask your own question:
 
 ```bash
-python python_examples/03_vector_search.py "How long do we keep invoice records?"
+python python_examples/03_vector_search.py "ต้องเก็บใบแจ้งหนี้ไว้นานเท่าไร?"
 ```
 
 **Tip:** keep the vector store to save time in later labs:
@@ -120,6 +124,8 @@ python python_examples/03_vector_search.py "How long do we keep invoice records?
 python python_examples/03_vector_search.py --keep
 # copy the printed id into .env as AP_POLICY_VECTOR_STORE_ID=vs_...
 ```
+
+If you indexed the previous English policy, create a fresh store for the Thai PDF and replace that ID. Keeping an old ID does not re-upload the revised document.
 
 **Checkpoint 2.3:** the last question gets a polite "I cannot find that" instead of a made-up answer.
 
@@ -134,7 +140,7 @@ python python_examples/04_text2sql.py
 **What happens:**
 
 1. The model gets the database schema and returns SQL using a strict JSON schema.
-2. `assertReadOnly` blocks anything that is not a single `SELECT` or `WITH` query.
+2. `assert_read_only` blocks anything that is not a single `SELECT` or `WITH` query.
 3. The SQL runs on the local SQLite database (`data/ap_database.sql`). If it errors, the model gets one retry with the error message.
 4. The model answers from the returned rows only.
 
@@ -142,16 +148,16 @@ Expected answers (as of `AP_AS_OF_DATE=2026-11-24`):
 
 | Question | Expected answer |
 |---|---|
-| Invoices on hold and why? | `INV-AMA-0931`, Andaman Marketing, THB 267,500. Vendor blocked: Por Por 20 certificate expired |
+| Invoices on hold and why? | `INV-AMA-0931`, บริษัท อันดามันมาร์เก็ตติ้งเอเจนซี จำกัด, THB 267,500. Vendor blocked awaiting replacement ภ.พ.20 in this synthetic scenario |
 | Approved, overdue, unpaid? | `INV-TTS-2026-102`, due 2026-11-14, THB 128,400 |
-| Paid to Rama Property in 2026? | 3 payments of THB 81,600 = THB 244,800 net, WHT THB 12,000 |
+| Paid to บริษัท พระรามบริหารทรัพย์สิน จำกัด in 2026? | 3 payments of THB 81,600 = THB 244,800 net, WHT THB 12,000 |
 | `INV-SOS-2026-0388` submitted twice? | Yes. Paid on 2026-10-06; resubmission received 2026-11-10 was rejected |
 | `PO-2026-0103` ordered vs received? | Pallets 120 ordered / 100 received, trips 6 ordered / 5 received |
 
 **Exercise:** try a question that tries to change data:
 
 ```bash
-python python_examples/04_text2sql.py "Delete all rejected invoices"
+python python_examples/04_text2sql.py "ลบใบแจ้งหนี้ที่ถูกปฏิเสธทั้งหมด"
 ```
 
 You will see either `[blocked] Query contains a write/DDL keyword.` or a harmless `SELECT` that only lists the rejected invoices. Nothing is ever deleted. Why must the guardrail be code and not only a prompt instruction?
@@ -166,15 +172,17 @@ You will see either `[blocked] Query contains a write/DDL keyword.` or a harmles
 python python_examples/05_web_iq.py
 ```
 
-**What happens:** `webIqSearch` calls `POST https://api.microsoft.ai/v3/search/web` and gets passages with URLs. The model answers **only** from those passages and cites them as `[1]`, `[2]`.
+**What happens:** `web_iq_search` calls `POST https://api.microsoft.ai/v3/search/web` and gets passages with URLs. The model answers **only** from those passages and cites them as `[1]`, `[2]`.
 
 Expected: an answer about the current Thai VAT rate and the WHT rate for transport services (1%), each with source URLs. Web content changes, so wording will differ.
 
 Ask your own:
 
 ```bash
-python python_examples/05_web_iq.py "Is Andaman Marketing Co Ltd in Thailand facing any legal issues?"
+python python_examples/05_web_iq.py "อัตราภาษีหัก ณ ที่จ่ายค่าโฆษณาของไทยในปัจจุบัน อ้างอิงกรมสรรพากร"
 ```
+
+Sample vendors are fictitious, so do not expect real vendor-news results. Use official tax or exchange-rate questions for the live-web exercise.
 
 **Discussion:** the policy PDF says WHT for services is 3%. What should happen if Web IQ says the law changed? (Answer: flag for a human, never silently override the policy.)
 

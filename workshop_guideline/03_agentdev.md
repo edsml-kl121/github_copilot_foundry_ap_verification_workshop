@@ -1,20 +1,41 @@
 # Lab 3: Build "Contoso AP Verify" with GitHub Copilot
 
-**Goal:** use GitHub Copilot Plan mode and Agent mode to turn the requirements meeting into a working, Python-only Streamlit app.
+**Goal:** turn the Thai requirements meeting into a local app with a **React/Vite frontend using Node.js** and a **Python/FastAPI backend**. All OCR, AI calls, SQL execution and verification rules remain in Python.
 
 **Time:** 45 to 60 minutes
 
-**Before you start:** finish Labs 1 and 2. Run the Python examples and tests first.
+**Before you start:** finish Labs 1 and 2, activate `.venv`, and confirm Node.js 22 LTS or later is installed:
+
+```bash
+node --version
+npm --version
+```
+
+The app files are intentionally not supplied. You build `frontend/` and `backend/` with Copilot during this lab. The repository provides the Python capability interfaces and dependencies.
 
 ## Lab 3.1: Read the requirements
 
-Open `data/meeting_transcript.txt`. It records the Finance team's decisions:
+Open `data/meeting_transcript.txt`. The meeting, policy, invoices and descriptive database values are in Thai. Technical identifiers, JSON keys, status codes and ISO dates retain their original format.
 
-- Upload + OCR, editable fields, three-way match checks, Ask the Policy, Ask the Data, Web check, one routed chat
-- Out-of-scope actions, including paying invoices
-- Four acceptance scenarios with expected outcomes
+```
+Thai invoice / user question
+            |
+            v
+React frontend (Node.js / Vite, port 5173)
+            |
+       /api/* proxy
+            |
+            v
+Python FastAPI backend (port 8000, local only)
+            |
+            +--> workshop_api.py --> OCR / File Search / Text2SQL / Web IQ
+            +--> verify.py + SQLite --> deterministic recommendation
+            |
+            v
+Thai UI + evidence --> human decision
+```
 
-The app must be Python-only. Do not generate a JavaScript frontend, Node.js server, or `package.json`.
+Node.js serves and builds the frontend only. Do not add a Node.js AI backend. API keys stay in the root `.env`, loaded only by Python. Never put secrets in `VITE_*` variables, browser storage or responses.
 
 ## Lab 3.2: Plan mode
 
@@ -22,61 +43,120 @@ The app must be Python-only. Do not generate a JavaScript frontend, Node.js serv
 2. Choose a strong reasoning model.
 3. Paste this prompt:
 
-```
-Read data/meeting_transcript.txt first. It contains the requirements and acceptance scenarios. Build the "Contoso AP Verify" application as a local, Python-only Streamlit app.
+```text
+Read data/meeting_transcript.txt first. It is the Thai requirements and acceptance scenarios.
+Build Contoso AP Verify locally with:
+- frontend/: React + TypeScript + Vite, Node.js 22 LTS or later.
+- backend/__init__.py and backend/main.py: Python + FastAPI.
+- No Streamlit, Express, Node.js AI calling code or cloud deployment.
 
-Do not use JavaScript, Node.js, Vite, Express, or package.json. Keep API keys on the local server side in .env. Keep chat history in Streamlit session state only.
-
-Use the existing Python interfaces and do not invent new Foundry SDK patterns:
-- Invoice OCR: python_examples/workshop_api.py:extract_invoice
+Reuse existing server-side Python interfaces:
+- OCR: python_examples/workshop_api.py:extract_invoice
 - Policy Vector Search: python_examples/workshop_api.py:ask_policy
-- AP database Text2SQL: python_examples/workshop_api.py:ask_data. Show its SQL in an expander.
-- Web IQ: python_examples/workshop_api.py:ask_web. Show source URLs.
+- Text2SQL: python_examples/workshop_api.py:ask_data
+- Web IQ: python_examples/workshop_api.py:ask_web
 - Routing: python_examples/workshop_api.py:route_chat
 - Deterministic decisions: python_examples/verify.py:verify_invoice
-- Database: sqlite3 with data/ap_database.sql
-- Shared model configuration: python_examples/common.py
+- SQLite seed: data/ap_database.sql
+- Model configuration: python_examples/common.py
 
-Create app.py and any small Python-only helpers needed. UI requirements:
-- Left column: invoice upload, extracted editable header and line fields, Verify button, outcome and checks table.
-- Right column: one chat with a Policy/Data/Web badge per response and a five-turn in-memory history.
-- Upload accepts PDF, PNG and JPG. Save uploads to a temporary file before calling extract_invoice, then remove the temporary file.
-- For the offline workshop demo, use data/invoices/ground_truth.json when the user selects the offline option.
-- The rules engine is the only source of APPROVED / ON HOLD / REJECTED. The model must never change the outcome.
-- A human AP Officer always makes the final decision. Never post, approve or pay an invoice.
+Create these endpoints:
+GET /api/health -> {"status":"ok"} with no Azure call.
+POST /api/extract -> multipart file field named file; return the extracted invoice object.
+POST /api/offline-invoice -> {"filename":"INV-TTS-2026-118.pdf"}; return that invoice object
+from ground_truth.json, accepting only known filenames, never arbitrary paths.
+POST /api/verify -> invoice JSON object; return verify_invoice's result unchanged.
+POST /api/chat -> {"question":"...", "history":[], "invoice":null, "verification":null};
+return {"route":"policy|data|web|out_of_scope|clarify","answer":"...","sql":null,"sources":[]}.
+Data responses contain the SQL actually executed. Web responses contain actual source objects.
 
-Add a simple requirements entry if Streamlit is needed. Add clear errors when configuration is missing. Do not commit .env or API keys.
+Use sync FastAPI handlers for the existing blocking Python tools, or explicitly offload them.
+Open and close a fresh in-memory SQLite connection per verification request.
+Use Pydantic request models and validate invoice field and line types.
+For upload, accept PDF/PNG/JPG only, cap size at 10 MB, use a random temporary file
+with the validated extension, and always remove it in finally.
+Return clear HTTP errors for missing configuration, rejected input and upstream failures.
+Log diagnostic details on the server without keys; never expose a traceback or secret to the browser.
+No success-shaped fallback after a failed AI request.
+
+All browser traffic uses relative /api/* URLs. Configure Vite server.proxy to
+http://127.0.0.1:8000 so localhost and Codespaces both work without browser-side localhost URLs.
+Python alone loads root .env. Never expose API keys through frontend code or VITE_* variables.
+Keep backend local. Do not enable wildcard CORS.
+
+UI:
+- Thai headings, buttons, help text, errors and answers.
+- Two columns: invoice upload/edit/verify on the left, routed chat on the right.
+- Editable header and line fields before verification; clear stale results when the invoice changes.
+- Thai outcome labels backed by the original APPROVED / ON HOLD / REJECTED codes.
+- Checks table with PASS / HOLD / REJECT, policy section and detail.
+- Policy/Data/Web badges shown as นโยบาย/ข้อมูล/เว็บ, collapsible SQL and source links.
+- Keep only five chat turns (ten user/assistant messages) in React memory.
+- Backend also truncates history before any AI call. Include invoice and verification as
+read-only context for "ทำไมใบนี้จึงพักรายการ", without allowing AI to alter rule results.
+- Loading states, prevent duplicate submissions, show backend failures clearly.
+- Offline mode selects a named sample and calls offline-invoice plus verify only.
+Disable AI chat in offline mode with a clear Thai explanation, rather than inventing answers.
+
+Only verify_invoice determines the recommendation. A human makes the final decision.
+Never write to the AP database, post, approve or pay an invoice.
+Use the existing root requirements.txt for Python dependencies. Add frontend/package.json
+and npm lockfile. Include dev/build scripts and focused API tests.
+Document the two-terminal startup and the Vite proxy.
 ```
 
-4. Answer Copilot's questions using the transcript. Suggested choices:
+4. Answer Copilot's questions using the transcript:
 
 | Likely question | Suggested answer |
 |---|---|
-| UI framework? | Streamlit, all Python |
-| App state? | `st.session_state`, keep the last 5 turns |
-| Chat routing? | Use `route_chat`, then call the matching Python function |
-| Where do decisions come from? | Always `verify_invoice`; the LLM only explains |
-| Show SQL? | Yes, in a collapsible expander |
+| Frontend? | React + TypeScript + Vite, Node.js only for frontend tooling |
+| Backend? | Python + FastAPI, reuse `workshop_api.py` |
+| App state? | React memory, last 5 turns; do not persist invoices or chat |
+| Chat routing? | Python `route_chat`, then the matching Python capability |
+| Decisions? | Always `verify_invoice`; AI only explains |
+| Language? | Thai UI and answers; preserve JSON keys, codes and ISO dates |
 
 ![Plan mode](../images/plan1.png)
 
-5. Review the plan. Confirm it only creates Python files and a Streamlit app. Check that the rules engine decides the outcome and the model only explains it. Select **Start implementation**.
+5. Review the plan. Confirm that AI calls and credentials stay in Python and that Vite proxies `/api/*`. Select **Start implementation**.
 
 ![Start implementation](../images/plan2.png)
-
 ![Implementing](../images/implement1.png)
 
 ## Lab 3.3: Run and test the app
 
-From the repository root, with the virtual environment active:
+After Copilot creates `frontend/` and `backend/`, open two terminals at the repository root.
+
+**Terminal 1: Python backend** (activate the virtual environment first):
 
 ```bash
-streamlit run app.py
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-### Test A: upload invoices
+**Terminal 2: Node.js frontend**:
 
-Upload each file from `data/invoices/` and compare the results:
+```bash
+cd frontend
+npm install
+npm run dev -- --host 0.0.0.0
+```
+
+Open `http://localhost:5173`. In Codespaces, forward **5173** as a **private** port and open its browser URL. Leave backend port 8000 unforwarded: the Vite proxy reaches it inside the same environment.
+
+Check the backend and the proxy:
+
+```bash
+curl --fail http://127.0.0.1:8000/api/health
+curl --fail http://localhost:5173/api/health
+```
+
+Both should return `{"status":"ok"}` without Azure calls.
+
+### Test A: Thai invoices and offline mode
+
+Select the offline sample first, then upload the Thai document in online mode:
 
 | File | Expected outcome | Key check |
 |---|---|---|
@@ -85,48 +165,82 @@ Upload each file from `data/invoices/` and compare the results:
 | `INV-BEL-7781_scan.png` | ON HOLD | Invoiced 120 pallets, only 100 received |
 | `INV-CMP-2026-0057.pdf` | ON HOLD | Bank account differs; call back on vendor-master phone |
 
-### Test B: chat and routing badges
+Verify the API independently. Prerequisite: generated backend running. No credentials are needed, and these requests only read sample data:
 
+```bash
+curl --fail http://127.0.0.1:8000/api/offline-invoice \
+  -H 'Content-Type: application/json' \
+  -d '{"filename":"INV-TTS-2026-118.pdf"}' \
+  | curl --fail http://127.0.0.1:8000/api/verify \
+      -H 'Content-Type: application/json' --data-binary @-
 ```
-Q1) What is the allowed unit price variance for a three-way match?
-Q2) Which invoices are on hold right now, and why?
-Q3.1) How much have we paid Rama Property Management in 2026?
-Q3.2) And how much withholding tax did we deduct from those payments?
-Q4) What is the current standard VAT rate in Thailand?
-Q5) Can you book me a flight to Chiang Mai?
+
+Check that Thai names and descriptions remain editable and are not converted into English. OCR may misread values; correct them before verification.
+
+### Test B: Thai chat and routing badges
+
+Online mode needs the Lab 1 credentials. These questions can incur model and Web IQ charges:
+
+```text
+Q1) ราคาต่อหน่วยในใบแจ้งหนี้ต่างจาก PO ได้ไม่เกินเท่าไร?
+Q2) มีใบแจ้งหนี้ใดพักรายการอยู่ เพราะอะไร?
+Q3.1) ปี 2026 จ่ายเงินให้บริษัท พระรามบริหารทรัพย์สิน จำกัด ไปเท่าไร?
+Q3.2) แล้วหักภาษี ณ ที่จ่ายจากการจ่ายเหล่านั้นเท่าไร?
+Q4) อัตราภาษีมูลค่าเพิ่มปัจจุบันของไทยเท่าไร?
+Q5) ช่วยจองตั๋วเครื่องบินไปเชียงใหม่ให้หน่อยได้ไหม?
 ```
 
 Expected:
 
+```text
+A1) [นโยบาย] ไม่เกิน 2% ต่อรายการ เทียบราคาต่อหน่วยใน PO (ข้อ 3.2)
+A2) [ข้อมูล] INV-AMA-0931, บริษัท อันดามันมาร์เก็ตติ้งเอเจนซี จำกัด, 267,500 บาท
+    ผู้ขายถูกระงับเพราะรอเอกสาร ภ.พ.20 ฉบับใหม่ตามสถานการณ์สมมติ
+A3.1) [ข้อมูล] จ่าย 3 ครั้ง ยอดสุทธิรวม 244,800 บาท
+A3.2) [ข้อมูล] หักภาษี ณ ที่จ่ายรวม 12,000 บาท โดยใช้บริบทคำถามก่อนหน้า
+A4) [เว็บ] อัตราปัจจุบันพร้อมลิงก์แหล่งอ้างอิง ข้อความขึ้นกับผลเว็บสด
+A5) [นอกขอบเขต] ปฏิเสธสุภาพและอธิบายว่าผู้ช่วยทำงานด้านตรวจใบแจ้งหนี้
 ```
-A1) [Policy] 2% per invoice line versus the PO unit price (Section 3.2).
-A2) [Data] INV-AMA-0931, Andaman Marketing, THB 267,500. Vendor blocked because its VAT certificate expired.
-A3.1) [Data] 3 payments, THB 244,800 net total.
-A3.2) [Data] THB 12,000 WHT. Uses conversation context for "those payments".
-A4) [Web] Current rate with source links. Wording depends on live web results.
-A5) [Out of scope] A polite refusal explaining what the AP assistant can do.
+
+### Test C: boundary and build checks
+
+Confirm the browser never receives keys and never calls Foundry or Web IQ directly. Try an unknown offline filename, an unsupported upload type and a write request such as "ลบใบแจ้งหนี้ที่ถูกปฏิเสธทั้งหมด". Invalid requests must show clear errors; no database rows may change.
+
+Run the existing rules tests and the generated frontend build:
+
+```bash
+python -m unittest discover -s python_examples -p 'test_*.py'
+cd frontend
+npm run build
 ```
+
+The Vite proxy is a development feature. A production deployment would need a reverse proxy or same-origin Python static hosting; deployment is outside this lab.
 
 ## Lab 3.4: Generate documentation
 
 In Agent mode:
 
-```
-Generate documentation.md for this Python Streamlit app. Include the architecture, invoice upload flow, chat routing flow, the Python functions used for each capability, and the rule that only verify_invoice determines the outcome. Include a plain-text diagram.
+```text
+Generate documentation.md for this React/Vite + Python/FastAPI app. Include the
+two-terminal setup, Vite proxy, endpoint contracts, upload cleanup, Thai data,
+chat routing, Python capability functions and the rule that verify_invoice alone
+determines the recommendation. Include a plain-text architecture diagram.
 ```
 
 ## Lab 3.5: Redesign the UI
 
 Save a finance dashboard screenshot in `images/`. Then in Agent mode:
 
-```
-Redesign the Streamlit UI to match images/<your-image>.png. Keep all features and Python backend logic unchanged. Do not add a JavaScript frontend or Node.js service.
+```text
+Redesign the React frontend to match images/<your-image>.png. Keep Thai UI text,
+all API contracts, Python backend logic and frontend/backend separation unchanged.
+Do not move keys, AI calls, SQL or verification rules into JavaScript.
 ```
 
 ## Stretch goals
 
-- Add a **Why?** button beside each HOLD check that passes its detail to `ask_policy`.
+- Add a **Why?** button beside each HOLD check that passes its detail to `ask_policy` through Python.
 - Add confidence badges to OCR fields and highlight values needing manual review.
-- Add a Web IQ vendor-news check with source links before the human approval step.
+- Add a Web IQ check of current official tax announcements before the human decision step.
 
 Continue to [Lab 4: Foundry portal](04_foundry_portal.md).

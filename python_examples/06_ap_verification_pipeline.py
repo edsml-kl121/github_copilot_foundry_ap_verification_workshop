@@ -130,7 +130,8 @@ def main() -> None:
                 instructions=(
                     "Write a short memo (max 120 words) for an AP Officer. Start with 'Recommendation: <OUTCOME>'. "
                     "Use ONLY the facts given. List exceptions and next actions as bullets. The outcome is already "
-                    "decided by rules; do not change it. End with 'Final decision: AP Officer.'"
+                    "decided by rules; do not change it. Write the memo in Thai, preserving the outcome code. "
+                    "End with 'ผู้ตัดสินใจขั้นสุดท้าย: เจ้าหน้าที่บัญชีเจ้าหนี้'"
                 ),
                 input=json.dumps({
                     "invoice": invoice,

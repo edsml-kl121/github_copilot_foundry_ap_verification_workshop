@@ -1,8 +1,9 @@
-"""Importable Python interfaces used by the Streamlit app in Lab 3."""
+"""Server-side Python interfaces used by the FastAPI backend in Lab 3."""
 
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from functools import lru_cache
 from pathlib import Path
@@ -79,10 +80,10 @@ def route_chat(question: str, history: list[dict] | None = None) -> str:
             "policy means Contoso AP rules; data means internal invoice, vendor, PO, receipt or payment records; "
             "web means current external facts; out_of_scope means unrelated tasks. Reply with only the category."
         ),
-        input={
+        input=json.dumps({
             "recent_conversation": (history or [])[-10:],
             "question": question,
-        },
+        }, ensure_ascii=False),
     )
     route = response.output_text.strip().lower()
     return route if route in {"policy", "data", "web", "out_of_scope"} else "clarify"

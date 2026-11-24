@@ -15,11 +15,11 @@ except ImportError:
     from text2sql import assert_read_only
 
 DEFAULT_QUESTIONS = [
-    "Which invoices are currently on hold, and why?",
-    "Which approved invoices are past their due date and still unpaid?",
-    "How much have we paid Rama Property Management in 2026, and how much withholding tax did we deduct?",
-    "Has invoice INV-SOS-2026-0388 been submitted more than once?",
-    "For PO-2026-0103, how much quantity per line has been ordered vs received?",
+    "มีใบแจ้งหนี้ใดพักรายการอยู่ เพราะอะไร?",
+    "ใบแจ้งหนี้ใดอนุมัติแล้วแต่เลยกำหนดชำระและยังไม่ได้จ่าย?",
+    "ปี 2026 จ่ายเงินให้บริษัท พระรามบริหารทรัพย์สิน จำกัด ไปเท่าไร และหักภาษี ณ ที่จ่ายเท่าไร?",
+    "ใบแจ้งหนี้ INV-SOS-2026-0388 ถูกส่งมากกว่าหนึ่งครั้งหรือไม่?",
+    "PO-2026-0103 สั่งซื้อและรับสินค้าจริงแต่ละรายการจำนวนเท่าไร?",
 ]
 SQL_SCHEMA = {
     "type": "object",
@@ -52,6 +52,8 @@ def generate_sql(client, cfg: dict[str, str], schema: str, question: str, previo
             "Dates are ISO text (YYYY-MM-DD). Money is THB. Use explicit columns and readable aliases. "
             "An invoice is unpaid if it has no row in payments. Limit results to 50 rows. "
             "Return only a read-only SELECT or WITH query.\nDatabase schema:\n" + schema
+            + "\nVendor names and descriptive values are Thai. When filtering by a vendor's name, "
+            "use a distinctive Thai substring with LIKE, not an English translation."
         ),
         input_data=prompt,
     )
@@ -74,7 +76,8 @@ def text2sql(client, question: str, cfg: dict[str, str]) -> dict:
         model=cfg["chat_deployment"],
         instructions=(
             "You are an AP analyst. Answer using ONLY the SQL result rows. Be brief, use THB with thousands "
-            "separators, and mention invoice numbers. If there are no rows, say nothing matched."
+            "separators, and mention invoice numbers. Answer in Thai and preserve Thai names. "
+            "If there are no rows, say nothing matched."
         ),
         input=f"Question: {question}\nSQL: {safe_sql}\nRows (JSON): {json.dumps(rows)}",
     )

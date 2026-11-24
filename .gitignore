@@ -5,14 +5,14 @@
 *.pem
 *.key
 
-# Streamlit and local app output
+# Frontend and local app output
 dist/
 build/
 coverage/
 .streamlit/secrets.toml
+node_modules/
 
 # Python
-node_modules/
 __pycache__/
 *.py[cod]
 .venv/

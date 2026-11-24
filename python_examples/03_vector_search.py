@@ -12,15 +12,15 @@ except ImportError:
 
 POLICY_INSTRUCTIONS = (
     "You are Contoso's AP policy assistant. Answer ONLY from the AP Invoice Verification Policy found with file search. "
-    "Quote the section number. If the policy does not cover the question, reply exactly: "
-    "'I cannot find that in the AP policy. Please contact ap-policy@contoso.example.'"
+    "Answer in Thai and quote the section number. If the policy does not cover the question, reply exactly: "
+    "'ไม่พบข้อมูลนี้ในนโยบายบัญชีเจ้าหนี้ กรุณาติดต่อ ap-policy@contoso.example'"
 )
 DEFAULT_QUESTIONS = [
-    "What is the allowed unit price variance in the three-way match?",
-    "The bank account on an invoice is different from our vendor master. What should I do?",
-    "Who must approve an invoice with a total of THB 267,500?",
-    "What withholding tax rate applies to IT service invoices, and what document do we issue?",
-    "What is Contoso's policy on remote work?",
+    "การตรวจเอกสารสามทางยอมให้ราคาต่อหน่วยต่างจาก PO ได้เท่าไร?",
+    "บัญชีธนาคารในใบแจ้งหนี้ต่างจากทะเบียนผู้ขาย ต้องทำอย่างไร?",
+    "ใครต้องอนุมัติใบแจ้งหนี้ยอดรวม 267,500 บาท?",
+    "ใบแจ้งหนี้บริการ IT หักภาษี ณ ที่จ่ายอัตราใด และต้องออกเอกสารอะไร?",
+    "คอนโทโซมีนโยบายทำงานจากที่บ้านอย่างไร?",
 ]
 
 

@@ -38,13 +38,13 @@ Agent = Model + Instructions + Tools + Knowledge
 2. Paste these **Instructions**:
 
    ```
-   You are Contoso's Accounts Payable policy assistant.
+   You are Contoso's Accounts Payable policy assistant. Answer in Thai, preserving invoice identifiers and status codes.
 
    Rules:
    1. For questions about Contoso AP rules, answer ONLY from the File Search results and cite the policy section number.
    2. For questions about current external facts (tax rates, laws, vendor news), use the Web IQ tool and include source URLs.
    3. If the answer is not in the policy or the web results, reply exactly:
-      "I cannot find that in the AP policy. Please contact ap-policy@contoso.example."
+      "ไม่พบข้อมูลนี้ในนโยบายบัญชีเจ้าหนี้ กรุณาติดต่อ ap-policy@contoso.example"
    4. Never approve, reject or pay an invoice. You explain rules; humans and the rules engine decide.
    5. If a web result conflicts with the policy, quote both and recommend escalation to the Finance Controller.
    ```
@@ -88,22 +88,22 @@ Web IQ exposes a Model Context Protocol (MCP) server, so any agent that supports
 Ask these in the **Chat** pane:
 
 ```
-Q1) What is the allowed unit price variance in a three-way match?
-Q2) An invoice asks us to pay a new bank account. What should I do?
-Q3) Who must approve an invoice of THB 267,500?
-Q4) Our policy says WHT for transport is 1%. Is that still the current Thai rate? Show sources.
-Q5) What is Contoso's policy on remote work?
+Q1) ราคาต่อหน่วยในใบแจ้งหนี้ต่างจาก PO ได้เท่าไร?
+Q2) ใบแจ้งหนี้ขอให้จ่ายเข้าบัญชีธนาคารใหม่ ต้องทำอย่างไร?
+Q3) ใครต้องอนุมัติใบแจ้งหนี้ยอดรวม 267,500 บาท?
+Q4) นโยบายระบุภาษีหัก ณ ที่จ่ายค่าขนส่ง 1% ปัจจุบันยังใช้อัตรานี้หรือไม่? แสดงแหล่งอ้างอิง
+Q5) คอนโทโซมีนโยบายทำงานจากที่บ้านอย่างไร?
 ```
 
 Expected:
 
 ```
-A1) 2% per line versus the PO unit price (Section 3.2).
-A2) Put the invoice ON HOLD, call back using the phone number in the vendor master (not the one on the invoice),
-    get a signed letter, two-person approval, and wait 5 business days before paying (Section 6).
-A3) The Finance Controller (Section 7).
-A4) Uses both tools: policy says 1% (Section 8) plus web sources about the current rate.
-A5) "I cannot find that in the AP policy. Please contact ap-policy@contoso.example."
+A1) ไม่เกิน 2% ต่อรายการ เทียบราคาต่อหน่วยใน PO (ข้อ 3.2)
+A2) ON HOLD โทรกลับด้วยเบอร์ในทะเบียนผู้ขาย ไม่ใช่เบอร์บนใบแจ้งหนี้
+    ขอหนังสือลงนาม ผู้อนุมัติสองคน และรอ 5 วันทำการก่อนจ่าย (ข้อ 6)
+A3) ผู้ควบคุมการเงิน (ข้อ 7)
+A4) ใช้ทั้งสองเครื่องมือ: นโยบายระบุ 1% (ข้อ 8) พร้อมแหล่งข้อมูลเว็บปัจจุบัน
+A5) "ไม่พบข้อมูลนี้ในนโยบายบัญชีเจ้าหนี้ กรุณาติดต่อ ap-policy@contoso.example"
 ```
 
 **Exercise:** open the run details or trace for Q4. Which tools were called, in which order?

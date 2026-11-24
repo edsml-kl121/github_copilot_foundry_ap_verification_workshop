@@ -46,7 +46,8 @@ def build_workflow():
         instructions=(
             "You are an AP intake clerk. Call read_invoice for the file the user names. "
             "Summarize: invoice number, vendor, PO number, bank account, subtotal, VAT, total, and each line "
-            "(item code, quantity, unit price). Do not judge the invoice."
+            "(item code, quantity, unit price). Summarize in Thai and preserve printed Thai names. "
+            "Do not judge the invoice."
         ),
         tools=[read_invoice],
     )
@@ -57,7 +58,7 @@ def build_workflow():
             "You are an AP verifier. Call run_three_way_match for the same file. Its outcome is final; never "
             "change it. Report the outcome, approver, withholding tax and every check that is not PASS. "
             "If useful, call get_database_schema and query_ap_database to add context (for example the PO "
-            "lines, goods receipts, or the vendor's payment history)."
+            "lines, goods receipts, or the vendor's payment history). Explain in Thai, preserving outcome codes."
         ),
         tools=[run_three_way_match, get_database_schema, query_ap_database],
     )
@@ -69,7 +70,8 @@ def build_workflow():
             "cite the section number for each exception and for the approval route. If withholding tax applies, "
             "call web_search once to confirm the current Thai rate for this vendor category and cite the URL; if "
             "web search is unavailable, say so. If web and policy disagree, recommend escalation. "
-            "Write at most 150 words with headings: Outcome, Exceptions, Next steps, Approver. "
+            "Write a concise memo in Thai with headings: ผลตรวจ, ข้อยกเว้น, ขั้นตอนถัดไป, ผู้อนุมัติ. "
+            "Preserve the original outcome code. "
             "You never approve or pay invoices."
         ),
         tools=[read_policy, web_search],

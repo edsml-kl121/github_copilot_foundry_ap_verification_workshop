@@ -78,6 +78,16 @@ def _value(field: dict | None):
     return None
 
 
+def _extract_bank_details(content: str) -> tuple[str | None, str | None]:
+    bank = re.search(
+        r"(?:remit to:?|please remit to:?|โอนเงินไปยัง\s*:?)\s*([^,\n]+),\s*"
+        r"(?:account no\.?|เลขที่บัญชี)\s*:?\s*([\d-]+)",
+        content,
+        re.I,
+    )
+    return (bank.group(1).strip(), bank.group(2)) if bank else (None, None)
+
+
 def extract_with_document_intelligence(file_path: Path, cfg: dict[str, str]) -> dict:
     url = (
         f"{cfg['docintel_endpoint']}documentintelligence/documentModels/prebuilt-invoice:analyze"
@@ -103,11 +113,7 @@ def extract_with_document_intelligence(file_path: Path, cfg: dict[str, str]) -> 
         if result.get("status") == "succeeded":
             analysis = result["analyzeResult"]
             fields = analysis.get("documents", [{}])[0].get("fields", {})
-            bank = re.search(
-                r"(?:remit to:?|please remit to:?)\s*([^,\n]+),\s*account no\.?\s*([\d-]+)",
-                analysis.get("content", ""),
-                re.I,
-            )
+            bank_name, bank_account = _extract_bank_details(analysis.get("content", ""))
             items = fields.get("Items", {}).get("valueArray", [])
             lines = []
             for index, item in enumerate(items, start=1):
@@ -130,8 +136,8 @@ def extract_with_document_intelligence(file_path: Path, cfg: dict[str, str]) -> 
                 "vendor_name": _value(fields.get("VendorName")),
                 "vendor_tax_id": tax_id("VendorTaxId"),
                 "buyer_tax_id": tax_id("CustomerTaxId"),
-                "bank_name": bank.group(1).strip() if bank else None,
-                "bank_account": bank.group(2) if bank else None,
+                "bank_name": bank_name,
+                "bank_account": bank_account,
                 "currency": currency.get("currencyCode", "THB"),
                 "subtotal": _value(fields.get("SubTotal")),
                 "vat": _value(fields.get("TotalTax")),
@@ -153,6 +159,7 @@ def extract_with_vision(file_path: Path, cfg: dict[str, str]) -> dict:
         schema=INVOICE_SCHEMA,
         instructions=(
             "You are an OCR engine for supplier tax invoices. Transcribe values exactly as printed. "
+            "Preserve Thai names and descriptions without translation. "
             "Use null for anything not visible. Numbers must be plain numbers without commas. Dates as YYYY-MM-DD."
         ),
         input_data=[{

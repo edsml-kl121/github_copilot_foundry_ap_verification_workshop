@@ -13,7 +13,7 @@
 | 1.4 | Confirm Document Intelligence (OCR) | You know your `cognitiveservices` endpoint |
 | 1.5 | Get a Web IQ API key | You have a `WEBIQ_API_KEY` |
 | 1.6 | Create `.env`, install Python packages, run setup check | All rows PASS (Web IQ may be SKIP) |
-| 1.7 | Run offline tests and pipeline | 3 Python tests pass and you see 4 outcomes |
+| 1.7 | Run offline tests and pipeline | All Python tests pass and you see 4 outcomes |
 
 > **Instructor-provided environment?** If your instructor gave you a credentials block, skip the "create" parts of 1.1 and 1.2 and only do the "check" parts.
 
@@ -48,6 +48,15 @@ git clone <this-repo-url>
 cd github_copilot_foundry_ap_verification_workshop
 python3 --version
 ```
+
+**For Lab 3:** install [Node.js 22 LTS or later](https://nodejs.org/en/download) for the React/Vite frontend. In Codespaces, check the available version before the app lab:
+
+```bash
+node --version
+npm --version
+```
+
+Node.js is frontend tooling only. Backend, AI examples and business rules still use Python. The policy, invoice PDFs, scan, database descriptions and requirements transcript are Thai; identifiers and ISO dates remain unchanged.
 
 **Checkpoint 1.0:** Copilot Chat replies to `hello` in VS Code.
 
@@ -240,7 +249,7 @@ This proves the AP business rules work before we add AI.
 python -m unittest discover -s python_examples -p 'test_*.py'
 ```
 
-Expected: 3 tests pass.
+Expected: all tests pass, including Thai document/data consistency and OCR bank parsing.
 
 2. Run the capstone pipeline in offline mode. It skips OCR (uses `data/invoices/ground_truth.json`) and skips all AI calls:
 

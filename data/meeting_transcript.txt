@@ -1,135 +1,144 @@
-════════════════════════════════════════════════════════════════
-MEETING MINUTES: AI Invoice Verification Assistant Requirements
-"Contoso AP Verify" | Contoso (Thailand) Co., Ltd., Finance Department
-════════════════════════════════════════════════════════════════
+บันทึกการประชุม: ความต้องการระบบผู้ช่วย AI ตรวจสอบใบแจ้งหนี้
+"Contoso AP Verify" | บริษัท คอนโทโซ (ประเทศไทย) จำกัด ฝ่ายการเงิน
 
-Date:        18 November 2026
-Time:        14:00 – 15:30
-Location:    Meeting Room 7B / Microsoft Teams
-Recorded by: Malee Chaiyaporn
+วันที่: 18 พฤศจิกายน 2569 (ค.ศ. 2026)
+เวลา: 14:00 ถึง 15:30 น.
+สถานที่: ห้องประชุม 7B / Microsoft Teams
+ผู้บันทึก: มาลี ชัยพร
 
-Attendees
-───────────────────────────────────────────────────────────────
-- Kanya Wongsuwan, AP Manager (Chair)
-- Malee Chaiyaporn, Senior AP Officer
-- Thanapol Rungroj, System Developer (IT)
-- Pimchanok Suksawat, IT Officer / System Administrator
-- Arthit Boonmee, Tax Specialist (joined for item 7)
+ผู้เข้าร่วมประชุม
+- กัญญา วงศ์สุวรรณ ผู้จัดการบัญชีเจ้าหนี้ (ประธาน)
+- มาลี ชัยพร เจ้าหน้าที่บัญชีเจ้าหนี้อาวุโส
+- ธนพล รุ่งโรจน์ นักพัฒนาระบบ ฝ่าย IT
+- พิมพ์ชนก สุขสวัสดิ์ เจ้าหน้าที่ IT / ผู้ดูแลระบบ
+- อาทิตย์ บุญมี ผู้เชี่ยวชาญภาษี (เข้าร่วมในหัวข้อภาษี)
 
-════════════════════════════════════════════════════════════════
-Background and Objectives
-───────────────────────────────────────────────────────────────
-The AP team receives around 1,200 supplier invoices per month as PDFs and phone
-photos. Each invoice is checked by hand against the Purchase Order (PO) and the
-Goods Receipt Note (GRN), the "three-way match", then against the AP Invoice
-Verification Policy. Officers spend most of their time re-typing invoice data and
-searching the policy. Two near-misses in Q3 involved invoices asking for payment to
-a new bank account.
+หมายเหตุ: บริษัท บุคคล เลขผู้เสียภาษี และบัญชีธนาคารทั้งหมดเป็นข้อมูลสมมติ
+ใช้เพื่อฝึกอบรมเท่านั้น ไม่ใช่คำแนะนำด้านภาษีหรือกฎหมาย
 
-The CFO asked for a Proof of Concept (PoC) of an AI assistant built on Microsoft
-Foundry that reads invoices, checks them against our data and policy, and
-recommends an outcome. A human AP Officer always makes the final decision.
+ที่มาและวัตถุประสงค์
+ทีมบัญชีเจ้าหนี้ (AP) รับใบแจ้งหนี้ประมาณ 1,200 ฉบับต่อเดือน ทั้ง PDF และภาพถ่าย
+เจ้าหน้าที่ต้องพิมพ์ข้อมูลใหม่ แล้วเทียบใบสั่งซื้อ (PO) ใบรับสินค้า (GRN)
+และใบแจ้งหนี้ หรือ "การตรวจสอบเอกสารสามทาง" พร้อมค้นหานโยบายที่เกี่ยวข้อง
+ในไตรมาส 3 มีสองกรณีที่เกือบจ่ายเงินไปยังบัญชีธนาคารใหม่โดยยังไม่ได้ยืนยัน
 
-════════════════════════════════════════════════════════════════
-Summary of Key Points
-════════════════════════════════════════════════════════════════
+CFO ขอระบบต้นแบบ (PoC) บน Microsoft Foundry เพื่ออ่านเอกสาร ตรวจข้อมูลกับนโยบาย
+และเสนอผลการตรวจสอบ โดยเจ้าหน้าที่ AP ที่เป็นมนุษย์ต้องตัดสินใจขั้นสุดท้ายเสมอ
 
-1. System Name and Goal
-───────────────────────────────────────────────────────────────
-The meeting agreed to name the app "Contoso AP Verify". Phase 1 goal: help AP
-Officers verify one invoice at a time faster and more consistently. The app only
-RECOMMENDS (APPROVED / ON HOLD / REJECTED); it never posts, approves or pays.
+ข้อสรุปการประชุม
 
-2. Users and Scale
-───────────────────────────────────────────────────────────────
-Phase 1 users are 2–3 AP Officers testing with the sample invoices in
-data/invoices. No need to design for high volume yet. Focus on correctness and a
-clear explanation of every check.
+1. ชื่อระบบและเป้าหมาย
+ใช้ชื่อ "Contoso AP Verify" ระยะแรกช่วยตรวจใบแจ้งหนี้ครั้งละหนึ่งฉบับให้เร็วและสม่ำเสมอ
+ระบบให้เพียงคำแนะนำ APPROVED (ผ่านการตรวจสอบ), ON HOLD (พักรายการ),
+หรือ REJECTED (ปฏิเสธ) ไม่บันทึกบัญชี ไม่อนุมัติ และไม่จ่ายเงินจริง
 
-3. Tech Stack and Deployment
-───────────────────────────────────────────────────────────────
-IT wants one simple, Python-only local app. Build it with Streamlit and Python;
-do not add a JavaScript frontend or Node.js backend. Run locally on team machines;
-no cloud deployment in this phase. Reuse the Microsoft Foundry Python examples in
-python_examples/ for every Foundry call; do not invent new SDK patterns.
+2. ผู้ใช้และขนาดระบบ
+เจ้าหน้าที่ AP 2 ถึง 3 คนทดลองกับเอกสารใน data/invoices/
+ยังไม่ต้องรองรับงานปริมาณสูง เน้นความถูกต้องและคำอธิบายแต่ละข้อ
 
-4. Feature 1: Invoice Upload and OCR
-───────────────────────────────────────────────────────────────
-The officer uploads a PDF or image. The app extracts header fields (invoice number,
-dates, PO number, vendor name and tax ID, buyer tax ID, bank details, subtotal, VAT,
-total) and line items. Use Document Intelligence prebuilt-invoice for PDFs and the
-vision model for photos (python_examples/02_ocr_invoice.py). Show the extracted fields in an
-editable form so the officer can correct OCR mistakes before verification.
+3. เทคโนโลยีและการรันระบบ
+ธนพลเสนอแยกส่วนแสดงผลออกจากส่วนประมวลผล:
+- Frontend: React + Vite ใช้ Node.js 22 LTS ขึ้นไปสำหรับ npm และ dev server
+  สร้างใน frontend/ ให้หน้าจอ ปุ่ม และข้อความผู้ใช้เป็นภาษาไทย
+- Backend: Python 3.11 ขึ้นไป + FastAPI ใน backend/main.py
+  รันจากรากโครงการด้วย python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+- การเรียก OCR, Microsoft Foundry, Vector Search, Text2SQL และ Web IQ
+  ต้องอยู่ฝั่ง Python เท่านั้น โดยใช้ python_examples/workshop_api.py และตัวอย่างเดิม
+- เก็บ API key ใน .env ฝั่ง Python ห้ามใส่ใน frontend, ตัวแปร VITE_*, หรือส่งไปเบราว์เซอร์
+- Frontend เรียก /api/* ผ่าน Vite proxy ไปที่ http://127.0.0.1:8000
+  ไม่เพิ่ม Express หรือ Node.js backend สำหรับ AI และไม่ใช้ Streamlit
+- รันเฉพาะเครื่องผู้เรียน ไม่มี cloud deployment ในระยะแรก
 
-5. Feature 2: Three-Way Match and Controls
-───────────────────────────────────────────────────────────────
-After OCR, run the deterministic checks in python_examples/verify.py against the AP database:
-vendor master, blocked vendor, bank account change, duplicate invoice, PO exists,
-unit price tolerance, quantity vs received, subtotal tolerance, VAT 7%, approval
-level and withholding tax. Show each check as a row with PASS / HOLD / REJECT, the
-policy section, and the detail. Kanya was firm: pass/fail must come from rules, not
-from the AI model.
+พิมพ์ชนกย้ำว่า Vite proxy ต้องใช้ได้ใน Codespaces ด้วย
+Frontend ใช้พอร์ต 5173 สำหรับ dev server และมีเพียง frontend ที่ต้อง forward port
+Backend อยู่ภายในเครื่องเดียวกัน ไม่เปิดพอร์ตสู่สาธารณะ
 
-6. Feature 3: Ask the Policy (Vector Search)
-───────────────────────────────────────────────────────────────
-A chat panel where officers ask questions about the AP Invoice Verification Policy
-(data/Contoso_AP_Invoice_Policy.pdf) using File Search (python_examples/03_vector_search.py).
-Answers must cite the policy section. If the answer is not in the policy, the bot
-must say so and point to ap-policy@contoso.example. When an invoice has
-exceptions, automatically ask the policy what to do and show the guidance.
+4. อัปโหลดใบแจ้งหนี้และ OCR
+ผู้ใช้เลือก PDF, PNG หรือ JPG ส่งเป็น multipart field ชื่อ file ไปที่ POST /api/extract
+Backend บันทึกไฟล์ชั่วคราว ใช้ extract_invoice แล้วลบไฟล์ใน finally แม้ OCR ล้มเหลว
+ตรวจนามสกุลและจำกัดไฟล์ไม่เกิน 10 MB
+แสดงข้อมูลหัวเอกสารและรายการสินค้าให้แก้ไขได้ก่อนตรวจสอบ
+ข้อมูลสำคัญคือเลขที่ใบแจ้งหนี้ วันที่ เลข PO ผู้ขาย เลขผู้เสียภาษีผู้ขายและผู้ซื้อ
+บัญชีธนาคาร ยอดก่อนภาษี VAT ยอดรวม และรายการสินค้า
+เอกสารตัวอย่างเป็นภาษาไทย วันที่ในใบแจ้งหนี้และฐานข้อมูลใช้ ค.ศ. ในรูป YYYY-MM-DD
+ต้องรักษาชื่อและรายละเอียดภาษาไทยตามเอกสาร ไม่แปลกลับเป็นภาษาอังกฤษ
 
-7. Feature 4: Ask the Data (Text2SQL)
-───────────────────────────────────────────────────────────────
-Officers often ask ad-hoc questions such as "which invoices are on hold?" or "what
-did we pay this vendor this year?". The chat should answer these from the AP
-database using Text2SQL (python_examples/04_text2sql.py). Always show the generated SQL in a
-collapsible block so the answer can be audited. Read-only: SELECT queries only.
+โหมดออฟไลน์สำหรับสาธิต: ให้ผู้ใช้เลือกเอกสารตัวอย่างที่ระบุชื่อแน่นอน
+ส่ง JSON {"filename":"INV-TTS-2026-118.pdf"} ไป POST /api/offline-invoice
+Backend อ่านเฉพาะชื่อที่มีอยู่ใน data/invoices/ground_truth.json
+ไม่รับ path จากผู้ใช้ และไม่เรียก AI ในโหมดนี้
 
-8. Feature 5: Web Check (Web IQ)
-───────────────────────────────────────────────────────────────
-Arthit asked for a way to confirm current Thai tax rules (VAT, withholding tax
-rates, filing deadlines) and Bank of Thailand FX rates, because the policy can lag
-behind Revenue Department announcements. Use Microsoft Web IQ
-(python_examples/05_web_iq.py). Always show source links and prefer official sources
-(rd.go.th, bot.or.th). Web results are advisory only and never change a rule result.
+5. การตรวจเอกสารสามทางและมาตรการควบคุม
+ส่งข้อมูลที่แก้ไขแล้วเป็น JSON object ของใบแจ้งหนี้ไป POST /api/verify
+Backend เปิด sqlite3 จาก data/ap_database.sql ในหน่วยความจำและปิดเมื่อจบคำขอ
+ใช้ python_examples/verify.py:verify_invoice ตรวจทะเบียนผู้ขาย ผู้ขายถูกระงับ
+การเปลี่ยนบัญชี ใบแจ้งหนี้ซ้ำ PO ราคา จำนวนที่รับ ยอดก่อนภาษี VAT 7%
+ระดับผู้อนุมัติ และภาษีหัก ณ ที่จ่าย
+แสดงผลแต่ละข้อเป็น PASS / HOLD / REJECT พร้อมเลขข้อนโยบายและรายละเอียด
+กัญญาย้ำว่าผลต้องมาจากกฎ Python เท่านั้น ไม่ใช่การตัดสินของโมเดล
+ใช้รหัสผลภาษาอังกฤษเดิมใน JSON แต่แสดงป้ายและคำอธิบายภาษาไทยบนหน้าจอ
 
-9. Routing the Chat
-───────────────────────────────────────────────────────────────
-One chat box. The app decides whether a question is about the POLICY, the DATA,
-or the WEB, and shows a small badge ("Policy", "Data", "Web") on each answer. If
-unsure, ask the user a short clarifying question.
+6. ถามนโยบาย (Vector Search)
+ใช้ ask_policy ค้น data/Contoso_AP_Invoice_Policy.pdf ผ่าน File Search
+ตอบเป็นภาษาไทยพร้อมอ้างเลขข้อนโยบาย ถ้าไม่มีข้อมูลให้บอกตรง ๆ
+และแนะนำ ap-policy@contoso.example ไม่สร้างคำตอบเอง
+เมื่อพบข้อยกเว้น ควรให้ปุ่มถามนโยบายว่าต้องดำเนินการต่ออย่างไร
 
-10. Chat History
-───────────────────────────────────────────────────────────────
-Keep the last 5 turns in memory (sliding window). No database for chat history.
-The currently loaded invoice and its check results should be available as context
-so the officer can ask "why is this on hold?".
+7. ถามข้อมูลภายใน (Text2SQL)
+ใช้ ask_data สำหรับคำถาม เช่น "มีใบแจ้งหนี้ใดพักรายการอยู่ เพราะอะไร"
+หรือ "ปี 2026 จ่ายเงินให้บริษัท พระรามบริหารทรัพย์สิน จำกัด ไปเท่าไร"
+แสดง SQL ที่สร้างในส่วนพับเก็บได้ พร้อมข้อมูลผลลัพธ์และคำตอบภาษาไทย
+ใช้ assert_read_only ก่อนรัน SQL ทุกครั้ง อนุญาต SELECT หรือ WITH ... SELECT
+เพียงคำสั่งเดียว ห้ามเขียนข้อมูล
+ชื่อคอลัมน์ รหัสผู้ขาย รหัสสินค้า สถานะ และวันที่ ISO ใช้รูปเดิม
+แต่ชื่อบริษัท แผนก รายละเอียดสินค้า และหมายเหตุเป็นภาษาไทย
 
-11. Out of Scope for Phase 1
-───────────────────────────────────────────────────────────────
-- Writing to the AP database, approving or paying invoices
-- Email integration and supplier notifications
-- User login and roles (single local user)
-- Thai-language OCR tuning (sample invoices are in English)
+8. ตรวจข้อมูลภายนอก (Web IQ)
+อาทิตย์ขอให้ตรวจอัตรา VAT ภาษีหัก ณ ที่จ่าย กำหนดยื่นแบบ
+และอัตราแลกเปลี่ยนจากแหล่งข้อมูลปัจจุบัน เพราะนโยบายอาจปรับช้ากว่าประกาศ
+ใช้ ask_web แสดงคำตอบภาษาไทยและลิงก์แหล่งที่มา เน้น rd.go.th และ bot.or.th
+ผลเว็บเป็นข้อมูลประกอบเท่านั้น ห้ามเปลี่ยนผลตรวจจากกฎโดยอัตโนมัติ
+บริษัทตัวอย่างเป็นข้อมูลสมมติ จึงไม่คาดหวังผลค้นหาข่าวผู้ขายจริง
 
-════════════════════════════════════════════════════════════════
-Acceptance Scenarios (use the sample invoices)
-════════════════════════════════════════════════════════════════
-- INV-SOS-2026-0415.pdf → APPROVED, route to AP Manager (> THB 50,000)
-- INV-TTS-2026-118.pdf  → ON HOLD, unit price +8.7% over PO (limit 2%)
-- INV-BEL-7781.pdf / INV-BEL-7781_scan.png → ON HOLD, billed 120 pallets, 100 received
-- INV-CMP-2026-0057.pdf → ON HOLD, bank account differs from vendor master;
-  call back using the vendor-master phone number
+9. การเลือกเส้นทางแชต
+มีช่องแชตเดียว ใช้ POST /api/chat รับ JSON:
+{"question":"คำถามภาษาไทย","history":[],"invoice":null,"verification":null}
+ให้ Python ใช้ route_chat แล้วเรียก ask_policy, ask_data หรือ ask_web
+คืน {"route":"policy|data|web|out_of_scope|clarify","answer":"...","sql":null,"sources":[]}
+เส้นทาง data ต้องคืน SQL จริง เส้นทาง web ต้องคืนแหล่งอ้างอิงจริง
+ถ้าไม่เกี่ยวกับ AP ให้ปฏิเสธสุภาพ ถ้าไม่ชัดให้ขอข้อมูลเพิ่ม
+ป้ายเส้นทางภาษาไทยบนหน้าจอ: "นโยบาย", "ข้อมูล", "เว็บ"
 
-════════════════════════════════════════════════════════════════
-Action Items
-════════════════════════════════════════════════════════════════
-| # | Action                                              | Owner     | Due         |
-|---|-----------------------------------------------------|-----------|-------------|
-| 1 | Build Python PoC with GitHub Copilot using examples | Thanapol  | 25 Nov 2026 |
-| 2 | Provision Foundry resource, models, Web IQ key      | Pimchanok | 21 Nov 2026 |
-| 3 | Review policy answers for accuracy                  | Malee     | 27 Nov 2026 |
-| 4 | Confirm WHT rates in policy Section 8 are current   | Arthit    | 27 Nov 2026 |
-| 5 | Demo to CFO                                         | Kanya     | 2 Dec 2026  |
+10. ประวัติแชตและสถานะ
+เก็บประวัติ 5 รอบล่าสุด (สูงสุด 10 ข้อความ user/assistant) ใน React memory
+ไม่ใช้ localStorage และไม่เพิ่มฐานข้อมูลประวัติ Backend ต้องจำกัดซ้ำก่อนเรียก AI
+ส่งใบแจ้งหนี้และผลตรวจปัจจุบันเป็นบริบทด้วย
+เพื่อให้ถามต่อได้ว่า "ทำไมใบนี้จึงพักรายการ"
+เมื่อสลับใบแจ้งหนี้ ต้องล้างผลตรวจเดิมเพื่อไม่ให้แสดงผลผิดฉบับ
 
-Next meeting: 25 November 2026, 14:00.
+11. การแจ้งข้อผิดพลาดและสิ่งที่อยู่นอกขอบเขต
+Frontend ต้องแสดงสถานะกำลังทำงาน ป้องกันการส่งซ้ำ และแสดงข้อความผิดพลาดจาก backend
+Backend คืน HTTP error เมื่อการตั้งค่าไม่ครบ ไฟล์ไม่ถูกต้อง หรือบริการ AI ใช้งานไม่ได้
+ห้ามส่ง API key หรือ traceback ให้เบราว์เซอร์ ห้ามแทนข้อผิดพลาดด้วยผลสำเร็จปลอม
+ไม่รวมการเขียนฐานข้อมูล AP อนุมัติหรือจ่ายเงิน การเชื่อมอีเมล การแจ้งผู้ขาย
+ระบบล็อกอิน สิทธิ์ผู้ใช้ และการฝึกโมเดล OCR ภาษาไทยเฉพาะทาง
+
+เกณฑ์ยอมรับงาน
+- INV-SOS-2026-0415.pdf -> APPROVED ส่งผู้จัดการ AP เพราะยอดเกิน 50,000 บาท
+- INV-TTS-2026-118.pdf -> ON HOLD ราคาต่อหน่วยสูงกว่า PO 8.7% เกินเกณฑ์ 2%
+- INV-BEL-7781.pdf / INV-BEL-7781_scan.png -> ON HOLD เรียกเก็บ 120 พาเลต รับจริง 100
+- INV-CMP-2026-0057.pdf -> ON HOLD บัญชีธนาคารต่างจากทะเบียนผู้ขาย
+  ต้องโทรยืนยันด้วยเบอร์ในทะเบียน ไม่ใช่เบอร์บนใบแจ้งหนี้
+- โหมดออฟไลน์ได้ผลทั้งสี่กรณีโดยไม่เรียก AI
+- npm run build สำเร็จ และ frontend ไม่มี API key หรือโค้ดเรียก Foundry โดยตรง
+- คำถามภาษาไทยเกี่ยวกับบริษัท พระรามบริหารทรัพย์สิน จำกัด ในปี 2026
+  ได้ยอดจ่ายสุทธิ 244,800 บาท และภาษีหัก ณ ที่จ่าย 12,000 บาท
+
+งานที่มอบหมาย
+1. ธนพล: สร้าง React frontend + Python backend ด้วย GitHub Copilot ภายใน 25 พฤศจิกายน 2569
+2. พิมพ์ชนก: เตรียม Foundry โมเดล และ Web IQ key ภายใน 21 พฤศจิกายน 2569
+3. มาลี: ทบทวนคำตอบนโยบายภาษาไทย ภายใน 27 พฤศจิกายน 2569
+4. อาทิตย์: ตรวจความเป็นปัจจุบันของอัตรา WHT ในนโยบายข้อ 8 ภายใน 27 พฤศจิกายน 2569
+5. กัญญา: สาธิตให้ CFO วันที่ 2 ธันวาคม 2569
+
+ประชุมครั้งถัดไป: 25 พฤศจิกายน 2569 เวลา 14:00 น.

@@ -1,6 +1,6 @@
 # GitHub Copilot + Microsoft Foundry Workshop: AP Invoice Verification
 
-Build an assistant that checks supplier invoices before Contoso (Thailand) pays them. The workshop is **Python-only** and demonstrates OCR, Vector Search, Text2SQL and Web IQ.
+Build an assistant that checks supplier invoices before Contoso (Thailand) pays them. The sample policy, invoices, database descriptions and requirements meeting are **in Thai**. OCR, Vector Search, Text2SQL, Web IQ and verification rules use **Python**; Lab 3 builds a **React/Vite frontend with Node.js** and a **Python/FastAPI backend**.
 
 **Why AP verification?** No finance experience is needed. A three-way match compares what the company ordered (Purchase Order), received (Goods Receipt) and was billed (Invoice). A deterministic Python rules engine decides whether an invoice is APPROVED, ON HOLD or REJECTED. The model explains the result, and a human makes the final decision.
 
@@ -8,9 +8,9 @@ Build an assistant that checks supplier invoices before Contoso (Thailand) pays 
 
 | Lab | Topic | Time |
 |---|---|---|
-| [1. Setup](workshop_guideline/01_setup_lab.md) | Python environment, Foundry models, keys and smoke checks | 30 to 40 min |
+| [1. Setup](workshop_guideline/01_setup_lab.md) | Python environment, Node.js frontend tooling, Foundry models, keys and smoke checks | 30 to 40 min |
 | [2. Capabilities](workshop_guideline/02_capabilities_lab.md) | Python examples for OCR, Vector Search, Text2SQL, Web IQ and the pipeline | 45 to 60 min |
-| [3. Build the app with Copilot](workshop_guideline/03_agentdev.md) | Build a local Python Streamlit app from the requirements transcript | 45 to 60 min |
+| [3. Build the app with Copilot](workshop_guideline/03_agentdev.md) | Build a Thai React/Vite UI + Python/FastAPI backend from the transcript | 45 to 60 min |
 | [4. Foundry portal](workshop_guideline/04_foundry_portal.md) | No-code agent with File Search and Web IQ MCP | 30 to 40 min |
 | [5. Agent Framework](workshop_guideline/05_agent_framework.md) | Python multi-agent workflow using the same rules | 30 to 45 min |
 
@@ -19,6 +19,10 @@ Quick reference: [Foundry_tutorial.md](Foundry_tutorial.md).
 ## Architecture
 
 ```
+React UI (Node.js / Vite) --> /api/* --> Python FastAPI backend
+                                              |
+                            Python capability interfaces below
+
 Invoice PDF / scan
         |
         v
@@ -46,6 +50,8 @@ Python rules: PO + receipt + invoice + bank + duplicates
 ```
 ├── .env.template                  # copy to .env (Lab 1)
 ├── requirements.txt               # Python dependencies for all labs
+├── frontend/                      # React/Vite, created by the student in Lab 3
+├── backend/                       # Python/FastAPI, created by the student in Lab 3
 ├── data/
 │   ├── meeting_transcript.txt     # requirements for the Copilot app build
 │   ├── Contoso_AP_Invoice_Policy.pdf
@@ -62,6 +68,8 @@ Python rules: PO + receipt + invoice + bank + duplicates
 │   └── verify.py                  # deterministic AP rules
 ├── agent_framework/               # multi-agent extension of the same Python tools
 ├── scripts/generate_sample_data.py
+├── scripts/requirements.txt        # optional document regeneration dependencies
+├── scripts/fonts/                 # bundled Sarabun fonts and OFL license
 └── workshop_guideline/
 ```
 
@@ -78,3 +86,15 @@ python python_examples/06_ap_verification_pipeline.py --offline
 ```
 
 All company names, people, tax IDs and bank accounts in `data/` are fictitious.
+Documents use Thai text with Arabic digits and ISO dates in the Gregorian year 2026 (Thai year 2569). JSON keys, SQL identifiers, item codes and status codes stay unchanged. Tax rules are workshop assumptions, not legal advice.
+
+Lab 3 requires **Node.js 22 LTS or later**. The frontend/backend application is built by the learner, not a prebuilt app in this repository. Follow its two-terminal instructions after implementation.
+
+To regenerate the Thai policy PDF, invoice PDFs, scan image, SQL seed and OCR ground truth:
+
+```bash
+pip install -r scripts/requirements.txt
+python scripts/generate_sample_data.py
+```
+
+This overwrites those sample files in `data/`. The Thai meeting transcript is maintained separately. If you previously indexed the English policy, create a new vector store and replace `AP_POLICY_VECTOR_STORE_ID`; an existing store still contains the old PDF.
