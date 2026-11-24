@@ -1,0 +1,19 @@
+{
+  "inputs": [
+    {
+      "id": "webiq-api-key",
+      "type": "promptString",
+      "description": "Microsoft Web IQ API key (https://webiq.microsoft.ai/profiles)",
+      "password": true
+    }
+  ],
+  "servers": {
+    "webiq": {
+      "type": "http",
+      "url": "https://api.microsoft.ai/v3/mcp",
+      "headers": {
+        "x-apikey": "${input:webiq-api-key}"
+      }
+    }
+  }
+}

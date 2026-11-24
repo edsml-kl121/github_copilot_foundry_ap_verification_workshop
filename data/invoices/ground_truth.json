@@ -1,0 +1,180 @@
+{
+  "INV-SOS-2026-0415.pdf": {
+    "invoice_number": "INV-SOS-2026-0415",
+    "invoice_date": "2026-10-28",
+    "due_date": "2026-11-27",
+    "po_number": "PO-2026-0101",
+    "vendor_name": "Siam Office Supplies Co., Ltd.",
+    "vendor_tax_id": "0105551234567",
+    "buyer_tax_id": "0105560000001",
+    "bank_name": "Kasikornbank",
+    "bank_account": "123-4-56789-0",
+    "currency": "THB",
+    "subtotal": 64100.0,
+    "vat": 4487.0,
+    "total": 68587.0,
+    "lines": [
+      {
+        "line_no": 1,
+        "item_code": "PAP-A4-80",
+        "description": "A4 copy paper 80gsm (box of 5 reams)",
+        "quantity": 50,
+        "unit_price": 650.0,
+        "amount": 32500.0
+      },
+      {
+        "line_no": 2,
+        "item_code": "TON-HP26A",
+        "description": "Toner cartridge HP 26A",
+        "quantity": 10,
+        "unit_price": 2800.0,
+        "amount": 28000.0
+      },
+      {
+        "line_no": 3,
+        "item_code": "MRK-WB-12",
+        "description": "Whiteboard markers (box of 12)",
+        "quantity": 20,
+        "unit_price": 180.0,
+        "amount": 3600.0
+      }
+    ],
+    "_scenario": "Clean 3-way match -> APPROVE (route to AP Manager, > THB 50,000)"
+  },
+  "INV-TTS-2026-118.pdf": {
+    "invoice_number": "INV-TTS-2026-118",
+    "invoice_date": "2026-11-02",
+    "due_date": "2026-12-17",
+    "po_number": "PO-2026-0102",
+    "vendor_name": "Thai Tech Solutions Co., Ltd.",
+    "vendor_tax_id": "0105562223334",
+    "buyer_tax_id": "0105560000001",
+    "bank_name": "Siam Commercial Bank",
+    "bank_account": "345-6-78901-2",
+    "currency": "THB",
+    "subtotal": 86000.0,
+    "vat": 6020.0,
+    "total": 92020.0,
+    "lines": [
+      {
+        "line_no": 1,
+        "item_code": "SVC-LAPTOP-IMG",
+        "description": "Laptop setup and imaging service (per device)",
+        "quantity": 40,
+        "unit_price": 1250.0,
+        "amount": 50000.0
+      },
+      {
+        "line_no": 2,
+        "item_code": "SVC-M365-MIG",
+        "description": "Microsoft 365 mailbox migration (per mailbox)",
+        "quantity": 40,
+        "unit_price": 900.0,
+        "amount": 36000.0
+      }
+    ],
+    "_scenario": "Unit price 1,250 vs PO 1,150 (+8.7%) -> HOLD (price variance > 2%)"
+  },
+  "INV-BEL-7781.pdf": {
+    "invoice_number": "INV-BEL-7781",
+    "invoice_date": "2026-11-05",
+    "due_date": "2026-12-05",
+    "po_number": "PO-2026-0103",
+    "vendor_name": "Bangkok Express Logistics Co., Ltd.",
+    "vendor_tax_id": "0105559876543",
+    "buyer_tax_id": "0105560000001",
+    "bank_name": "Bangkok Bank",
+    "bank_account": "234-5-67890-1",
+    "currency": "THB",
+    "subtotal": 61200.0,
+    "vat": 4284.0,
+    "total": 65484.0,
+    "lines": [
+      {
+        "line_no": 1,
+        "item_code": "LOG-BKK-RYG",
+        "description": "Pallet delivery Bangkok - Rayong (per pallet)",
+        "quantity": 120,
+        "unit_price": 450.0,
+        "amount": 54000.0
+      },
+      {
+        "line_no": 2,
+        "item_code": "LOG-FUEL",
+        "description": "Fuel surcharge (per trip)",
+        "quantity": 6,
+        "unit_price": 1200.0,
+        "amount": 7200.0
+      }
+    ],
+    "_scenario": "Billed 120 pallets / 6 trips but only 100 / 5 received -> HOLD (qty > GRN)"
+  },
+  "INV-BEL-7781_scan.png": {
+    "invoice_number": "INV-BEL-7781",
+    "invoice_date": "2026-11-05",
+    "due_date": "2026-12-05",
+    "po_number": "PO-2026-0103",
+    "vendor_name": "Bangkok Express Logistics Co., Ltd.",
+    "vendor_tax_id": "0105559876543",
+    "buyer_tax_id": "0105560000001",
+    "bank_name": "Bangkok Bank",
+    "bank_account": "234-5-67890-1",
+    "currency": "THB",
+    "subtotal": 61200.0,
+    "vat": 4284.0,
+    "total": 65484.0,
+    "lines": [
+      {
+        "line_no": 1,
+        "item_code": "LOG-BKK-RYG",
+        "description": "Pallet delivery Bangkok - Rayong (per pallet)",
+        "quantity": 120,
+        "unit_price": 450.0,
+        "amount": 54000.0
+      },
+      {
+        "line_no": 2,
+        "item_code": "LOG-FUEL",
+        "description": "Fuel surcharge (per trip)",
+        "quantity": 6,
+        "unit_price": 1200.0,
+        "amount": 7200.0
+      }
+    ],
+    "_scenario": "Billed 120 pallets / 6 trips but only 100 / 5 received -> HOLD (qty > GRN)"
+  },
+  "INV-CMP-2026-0057.pdf": {
+    "invoice_number": "INV-CMP-2026-0057",
+    "invoice_date": "2026-11-06",
+    "due_date": "2026-12-06",
+    "po_number": "PO-2026-0104",
+    "vendor_name": "Chiang Mai Paper Products Co., Ltd.",
+    "vendor_tax_id": "0505553334445",
+    "buyer_tax_id": "0105560000001",
+    "bank_name": "Siam Commercial Bank",
+    "bank_account": "999-1-23456-7",
+    "currency": "THB",
+    "subtotal": 26800.0,
+    "vat": 1876.0,
+    "total": 28676.0,
+    "lines": [
+      {
+        "line_no": 1,
+        "item_code": "PAP-RCY-A4",
+        "description": "Recycled A4 copy paper (per ream)",
+        "quantity": 200,
+        "unit_price": 115.0,
+        "amount": 23000.0
+      },
+      {
+        "line_no": 2,
+        "item_code": "CUP-8OZ-50",
+        "description": "Paper cups 8oz (pack of 50)",
+        "quantity": 40,
+        "unit_price": 95.0,
+        "amount": 3800.0
+      }
+    ],
+    "_scenario": "Amounts match but bank account differs from vendor master -> HOLD (bank change verification)"
+  }
+}

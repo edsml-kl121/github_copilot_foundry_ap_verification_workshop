@@ -1,0 +1,47 @@
+# Secrets (never commit real keys)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Streamlit and local app output
+dist/
+build/
+coverage/
+.streamlit/secrets.toml
+
+# Python
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.egg-info/
+
+# Editors and IDEs (keep shared example configs)
+.vscode/*
+!.vscode/mcp.json.example
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and temp files
+*.log
+logs/
+tmp/
+*.tmp
+
+# Azure / azd local state
+.azure/
